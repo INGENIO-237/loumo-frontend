@@ -44,6 +44,6 @@ export async function registerUser({
     .post("/users", { email, password })
     .then((response) => response.data)
     .catch((error) => {
-      console.log({ error });
+      throw error;
     });
 }
