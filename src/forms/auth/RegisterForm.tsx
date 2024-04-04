@@ -1,7 +1,10 @@
 import { object, string } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { registerUser } from "@/data/services/auth.services";
+import getKey from "@/utils/key.generator";
 
 const registerSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -20,6 +23,9 @@ const registerSchema = object({
 );
 
 export default function RegisterForm() {
+  const [apiErrors, setApiErrors] = useState([]);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -29,9 +35,9 @@ export default function RegisterForm() {
   });
 
   function onSubmit(data: any) {
-    console.log(typeof data);
-
-    console.log({ data });
+    registerUser(data)
+      .then((response) => navigate("/login", { replace: true, }))
+      .catch((error) => setApiErrors(error.response.data));
   }
 
   return (
@@ -39,6 +45,18 @@ export default function RegisterForm() {
       <div className="max-w-md min-w-[40%] min-h-[75%] mx-auto my-auto bg-gray-800 p-2 rounded">
         <h1 className="text-2xl text-center font-semibold mb-4">Register</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Display errors */}
+          {apiErrors && apiErrors.length > 0 && (
+            <span className="mb-4 bg-red-500 p-2 w-full block">
+              <ul>
+                {apiErrors.map((error: any) => (
+                  <li key={getKey()} className="italic">
+                    {error.message}
+                  </li>
+                ))}
+              </ul>
+            </span>
+          )}
           <div className="mb-4">
             <label htmlFor="email" className="block mb-1">
               Email
