@@ -1,10 +1,13 @@
 import { object, string } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, redirect } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUserIn } from "@/data/services/auth.services";
 import { useState } from "react";
 import getKey from "@/utils/key.generator";
+import { useDispatch } from "react-redux";
+import { getCurrentUser } from "@/redux/slices/authSlice";
+import { AppDispatch } from "@/redux/store";
 
 const loginSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -18,6 +21,9 @@ const loginSchema = object({
 
 export default function LoginForm() {
   const [apiErrors, setApiErrors] = useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
   const {
     register,
     handleSubmit,
@@ -28,7 +34,11 @@ export default function LoginForm() {
 
   function onSubmit(data: any) {
     loginUserIn(data)
-      .then((response) => redirect("/"))
+      .then((response) => {
+        const { accessToken } = response;
+        dispatch(getCurrentUser(accessToken));
+        return navigate("/", { replace: true });
+      })
       .catch((error) => setApiErrors(error.response.data));
   }
 
@@ -42,7 +52,9 @@ export default function LoginForm() {
             <span className="mb-4 bg-red-500 p-2 w-full block">
               <ul>
                 {apiErrors.map((error: any) => (
-                  <li key={getKey()} className="italic">{error.message}</li>
+                  <li key={getKey()} className="italic">
+                    {error.message}
+                  </li>
                 ))}
               </ul>
             </span>

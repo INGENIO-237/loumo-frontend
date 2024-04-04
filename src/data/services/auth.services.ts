@@ -12,6 +12,8 @@ export async function loginUserIn({
     .then((response) => {
       const { accessToken, refreshToken } = response.data;
 
+      localStorage.clear();
+
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
