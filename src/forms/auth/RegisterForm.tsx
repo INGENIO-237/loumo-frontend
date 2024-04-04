@@ -36,7 +36,7 @@ export default function RegisterForm() {
 
   function onSubmit(data: any) {
     registerUser(data)
-      .then((response) => navigate("/login", { replace: true, }))
+      .then(() => navigate("/login", { replace: true }))
       .catch((error) => setApiErrors(error.response.data));
   }
 
