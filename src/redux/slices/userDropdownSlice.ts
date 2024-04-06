@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface DropdownState{
-  show: boolean
+interface DropdownState {
+  show: boolean;
 }
 
 const initialState: DropdownState = {
@@ -12,8 +12,8 @@ const userDropdown = createSlice({
   name: "userDropdown",
   initialState,
   reducers: {
-    toggleUserMenu: (state) => {
-      state.show = !state.show;
+    toggleUserMenu: (state, payload) => {
+      state.show = payload ? payload.payload : !state.show;
     },
   },
 });
