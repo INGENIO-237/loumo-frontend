@@ -8,6 +8,7 @@ import getKey from "@/utils/key.generator";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "@/redux/slices/authSlice";
 import { AppDispatch } from "@/redux/store";
+import { toast } from "react-toastify";
 
 const loginSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -37,6 +38,7 @@ export default function LoginForm() {
       .then((response) => {
         const { accessToken } = response;
         dispatch(getCurrentUser(accessToken));
+        toast.success("Logged In successfully.")
         return navigate("/", { replace: true });
       })
       .catch((error) => setApiErrors(error.response.data));
