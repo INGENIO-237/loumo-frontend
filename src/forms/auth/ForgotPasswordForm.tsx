@@ -2,55 +2,56 @@ import { object, string } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { logUserIn } from "@/data/services/auth.services";
 import { useState } from "react";
 import getKey from "@/utils/key.generator";
-import { useDispatch } from "react-redux";
-import { getCurrentUser } from "@/redux/slices/authSlice";
-import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
+import { requestPasswordReset } from "@/data/services/auth.services";
 
-const loginSchema = object({
+const forgotPwdSchema = object({
   email: string({ required_error: "Email is required" }).email(
     "Invalid email format"
   ),
-  password: string({ required_error: "Password is required" }).min(
-    6,
-    "Too short - Password must be at least 6 chars long."
-  ),
 });
 
-export default function LoginForm() {
+export default function ForgotPasswordForm() {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(forgotPwdSchema),
   });
 
   function onSubmit(data: any) {
-    logUserIn(data)
-      .then((response) => {
-        const { accessToken } = response;
-        dispatch(getCurrentUser(accessToken));
-        toast.success("Logged In successfully.");
-        return navigate("/", { replace: true });
+    const { email } = data;
+
+    requestPasswordReset({ email })
+      .then(() => {
+        localStorage.setItem("email", email);
+
+        toast.success(
+          "An OTP CODE has been sent to your email address. Check it."
+        );
+
+        return navigate("/forgot-password-confirm", { replace: true });
       })
-      .catch((error) => setApiErrors(error.response.data));
+      .catch((error) => {
+        setApiErrors(error.response.data);
+      });
   }
 
   return (
     <div className="flex justify-content-center h-[100vh] text-white">
-      <div className="max-w-md min-w-[40%] min-h-[75%] mx-auto my-auto bg-gray-800 p-2 rounded">
-        <h1 className="text-2xl text-center font-semibold mb-4">Login</h1>
+      <div className="max-w-md min-w-[40%] min-h-[45%] mx-auto my-auto bg-gray-800 p-2 rounded">
+        <h1 className="text-2xl text-center font-semibold mb-4">
+          Forgot Password
+        </h1>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Display errors */}
-          {apiErrors && apiErrors.length > 0 && (
+          {apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0 && (
             <span className="mb-4 bg-red-500 p-2 w-full block">
               <ul>
                 {apiErrors.map((error: any) => (
@@ -58,6 +59,16 @@ export default function LoginForm() {
                     {error.message}
                   </li>
                 ))}
+              </ul>
+            </span>
+          )}
+
+          {apiErrors && !Array.isArray(apiErrors) && (
+            <span className="mb-4 bg-red-500 p-2 w-full block">
+              <ul>
+                <li key={getKey()} className="italic">
+                  {apiErrors}
+                </li>
               </ul>
             </span>
           )}
@@ -77,36 +88,16 @@ export default function LoginForm() {
               </span>
             )}
           </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              {...register("password")}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:border-blue-500 text-black"
-            />
-            {errors.password && (
-              <span className="text-red-500">
-                {errors.password.message?.toString()}
-              </span>
-            )}
-          </div>
-
-          <Link to="/forgot-password" className="text-right block mb-4">
-            Forgot password
-          </Link>
           <input
             type="submit"
-            value="Login"
+            value="Send"
             className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
           />
           <hr />
           <p className="text-center mt-6">
-            Don't have an account yet ?{" "}
-            <Link to="/register" className="ml-2 text-blue-500">
-              Sign up
+            Already have an account ?{" "}
+            <Link to="/login" className="ml-2 text-blue-500">
+              Sign in
             </Link>
           </p>
         </form>

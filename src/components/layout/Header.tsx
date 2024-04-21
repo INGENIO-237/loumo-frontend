@@ -51,8 +51,8 @@ export default function Header() {
           {showUserDropdownMenu ? (
             isAuthenticated ? (
               <div className="absolute shadow-lg ring-1 ring-black ring-opacity-5 transition-all duration-300 ease-in mt-5 bg-gray-200 p-2 rounded w-[180px]">
-                <Link to="#">
-                  <h1>{user?.email}</h1>
+                <Link to="/">
+                  <h1>Profile</h1>
                 </Link>
                 <Link to="#">
                   <h1>wijdidwijdi</h1>
