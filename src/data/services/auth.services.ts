@@ -1,6 +1,7 @@
 import { useMutation } from "react-query";
 import server from "../server";
 import { LoginFormData } from "@/forms/auth/LoginForm";
+import { ForgotPwdConfirmPayload } from "@/types/auth";
 
 export function useLogUserIn() {
   async function logUserIn({ email, password }: LoginFormData) {
@@ -75,7 +76,7 @@ export function useForgotPassword() {
   async function requestPasswordReset({ email }: { email: string }) {
     return server
       .post("/sessions/forgot-password", { email })
-      .then((response) => response)
+      .then(() => email)
       .catch((error) => {
         throw error;
       });
@@ -83,12 +84,13 @@ export function useForgotPassword() {
 
   const {
     mutateAsync: forgotPassword,
+    data,
     error,
     isLoading,
     isSuccess,
   } = useMutation(requestPasswordReset);
 
-  return { forgotPassword, error, isLoading, isSuccess };
+  return { forgotPassword, data, error, isLoading, isSuccess };
 }
 
 export function useConfirmForgotPassword() {
@@ -96,11 +98,7 @@ export function useConfirmForgotPassword() {
     email,
     otp,
     password,
-  }: {
-    email: string;
-    otp: number;
-    password: string;
-  }) {
+  }: ForgotPwdConfirmPayload) {
     return server
       .post("/sessions/forgot-password-confirm", { email, otp, password })
       .then((response) => console.log(response))
