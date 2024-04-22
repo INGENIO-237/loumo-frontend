@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/redux/slices/authSlice";
 import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
 import { LoginReturnData } from "@/types/auth";
-import { Loader } from "lucide-react";
+import RequestLoader from "@/components/ui/request-loader";
 
 const loginSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -115,9 +115,7 @@ export default function LoginForm({
             Forgot password
           </Link>
           {isLoading ? (
-            <div className="bg-blue-500 px-5 py-2 flex justify-center disabled w-full rounded cursor-not-allowed mb-4 opacity-50">
-              <Loader className="animate-spin" />
-            </div>
+            <RequestLoader />
           ) : (
             <input
               type="submit"

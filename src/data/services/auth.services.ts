@@ -62,12 +62,13 @@ export function useRegisterUser() {
 
   const {
     mutateAsync: signUserUp,
+    data,
     error,
     isLoading,
     isSuccess,
   } = useMutation(registerUser);
 
-  return { signUserUp, error, isLoading, isSuccess };
+  return { signUserUp, data, error, isLoading, isSuccess };
 }
 
 export function useForgotPassword() {
