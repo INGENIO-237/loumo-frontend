@@ -23,6 +23,10 @@ type Props = {
   error: any;
   isLoading: boolean;
   isSuccess: boolean;
+  resendOtp: (data: { email: string }) => void;
+  otpErrors: any;
+  resendOtpLoading: boolean;
+  otpSent: boolean;
 };
 
 export default function ForgotPasswordConfirmForm({
@@ -30,6 +34,10 @@ export default function ForgotPasswordConfirmForm({
   isLoading,
   isSuccess,
   error,
+  resendOtp,
+  resendOtpLoading,
+  otpSent,
+  otpErrors,
 }: Props) {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
@@ -44,8 +52,11 @@ export default function ForgotPasswordConfirmForm({
       return navigate("/login");
     }
 
+    if (otpSent) toast.success("Otp Code Sent");
+
     if (error) setApiErrors(error.response.data);
-  }, [isSuccess, error]);
+    if (otpErrors) setApiErrors(otpErrors.response.data);
+  }, [isSuccess, error, otpErrors, otpSent]);
 
   const {
     register,
@@ -123,7 +134,7 @@ export default function ForgotPasswordConfirmForm({
               </span>
             )}
           </div>
-          {isLoading ? (
+          {isLoading || resendOtpLoading ? (
             <RequestLoader />
           ) : (
             <input
@@ -135,7 +146,9 @@ export default function ForgotPasswordConfirmForm({
           <hr />
           <p className="text-center mt-6">
             <span
-              onClick={() => alert("Clickeeeeeeeeeeeeeeeeeeeeeeeeeeeed")}
+              onClick={() =>
+                resendOtp({ email: localStorage.getItem("email") as string })
+              }
               className="ml-2 text-blue-500 cursor-pointer"
             >
               Resend Code
