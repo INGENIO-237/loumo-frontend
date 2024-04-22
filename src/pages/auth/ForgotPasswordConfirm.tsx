@@ -1,9 +1,9 @@
-import ForgotPasswordConfirmForm from "@/forms/auth/ForgotPasswordConfirmForm";
+// import ForgotPasswordConfirmForm from "@/forms/auth/ForgotPasswordConfirmForm";
 
-export default function ForgotPasswordConfirmPage() {
-  return (
-    <>
-      <ForgotPasswordConfirmForm />
-    </>
-  );
-}
+// export default function ForgotPasswordConfirmPage() {
+//   return (
+//     <>
+//       <ForgotPasswordConfirmForm />
+//     </>
+//   );
+// }

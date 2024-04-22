@@ -1,9 +1,9 @@
-import ForgotPasswordForm from "@/forms/auth/ForgotPasswordForm";
+// import ForgotPasswordForm from "@/forms/auth/ForgotPasswordForm";
 
-export default function ForgotPasswordPage() {
-  return (
-    <>
-      <ForgotPasswordForm />
-    </>
-  );
-}
+// export default function ForgotPasswordPage() {
+//   return (
+//     <>
+//       <ForgotPasswordForm />
+//     </>
+//   );
+// }

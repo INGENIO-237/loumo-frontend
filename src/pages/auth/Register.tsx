@@ -1,9 +1,9 @@
-import RegisterForm from "@/forms/auth/RegisterForm";
+// import RegisterForm from "@/forms/auth/RegisterForm";
 
-export default function RegisterPage() {
-  return (
-    <>
-      <RegisterForm />
-    </>
-  );
-}
+// export default function RegisterPage() {
+//   return (
+//     <>
+//       <RegisterForm />
+//     </>
+//   );
+// }
