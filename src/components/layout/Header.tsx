@@ -20,7 +20,7 @@ export default function Header() {
   return (
     <div className="w-full flex justify-evenly items-center bg-[#FEFEFE] p-5">
       <div className="w-full flex justify-left pl-3">
-        <Link to="/">
+        <Link className="flex-1" to="/">
           <h1 className="text-3xl font-bold text-orange-500">Loumo</h1>
         </Link>
       </div>
@@ -37,18 +37,18 @@ export default function Header() {
           {isAuthenticated ? (
             <DropdownMenuContent className="mr-3 bg-white">
               <DropdownMenuItem>
-                <Link to="/profile">
+                <Link className="flex-1" to="/profile">
                   <h1>Profile</h1>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="#">
-                  <h1>hjhcjhuchsjoc</h1>
+                <Link className="flex-1" to="#">
+                  <h1>Orders</h1>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-gray-100" />
               <DropdownMenuItem>
-                <Link to="#">
+                <Link className="flex-1" to="#">
                   <h1>Logout</h1>
                 </Link>
               </DropdownMenuItem>
@@ -56,7 +56,7 @@ export default function Header() {
           ) : (
             <DropdownMenuContent className="mr-3 bg-white">
               <DropdownMenuItem>
-                <Link to="/login">
+                <Link className="flex-1" to="/login">
                   <h1>Login</h1>
                 </Link>
               </DropdownMenuItem>
