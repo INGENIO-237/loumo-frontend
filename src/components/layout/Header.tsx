@@ -21,8 +21,11 @@ export default function Header() {
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        dispatch(toggleUserMenu(false))
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        dispatch(toggleUserMenu(false));
       }
     };
 
@@ -35,7 +38,9 @@ export default function Header() {
   return (
     <div className="w-full flex justify-evenly items-center bg-[#FEFEFE] p-5">
       <div className="w-full flex justify-center">
-        <h1 className="text-3xl font-bold text-orange-500">Loumo</h1>
+        <Link to="/">
+          <h1 className="text-3xl font-bold text-orange-500">Loumo</h1>
+        </Link>
       </div>
       <div className="w-full flex justify-center mx-2">
         <SearchBar />
@@ -45,13 +50,17 @@ export default function Header() {
         <MenuItem icon={<ShoppingCart />} counter={0} link="#" />
         <div className="relative" ref={dropdownRef}>
           <MenuItem
-            icon={<User onClick={() => dispatch(toggleUserMenu(!showUserDropdownMenu))} />}
+            icon={
+              <User
+                onClick={() => dispatch(toggleUserMenu(!showUserDropdownMenu))}
+              />
+            }
             link="#"
           />
           {showUserDropdownMenu ? (
             isAuthenticated ? (
               <div className="absolute shadow-lg ring-1 ring-black ring-opacity-5 transition-all duration-300 ease-in mt-5 bg-gray-200 p-2 rounded w-[180px]">
-                <Link to="/">
+                <Link to="/profile">
                   <h1>Profile</h1>
                 </Link>
                 <Link to="#">
