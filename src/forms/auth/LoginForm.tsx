@@ -1,14 +1,15 @@
-import { object, string } from "zod";
+import { object, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { logUserIn } from "@/data/services/auth.services";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import getKey from "@/utils/key.generator";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "@/redux/slices/authSlice";
 import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
+import { LoginReturnData } from "@/types/auth";
+import RequestLoader from "@/components/ui/request-loader";
 
 const loginSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -20,35 +21,51 @@ const loginSchema = object({
   ),
 });
 
-export default function LoginForm() {
+export type LoginFormData = z.infer<typeof loginSchema>;
+
+type Props = {
+  logUserIn: (credentials: LoginFormData) => void;
+  data: LoginReturnData;
+  isSuccess: boolean;
+  error: any;
+  isLoading: boolean;
+};
+
+export default function LoginForm({
+  logUserIn,
+  data,
+  isLoading,
+  isSuccess,
+  error,
+}: Props) {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      const { accessToken } = data;
+      dispatch(getCurrentUser(accessToken));
+      toast.success("Logged In successfully.");
+      return navigate("/", { replace: true });
+    }
+
+    if (error) setApiErrors(error.response.data);
+  }, [isSuccess, data, error]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-
-  function onSubmit(data: any) {
-    logUserIn(data)
-      .then((response) => {
-        const { accessToken } = response;
-        dispatch(getCurrentUser(accessToken));
-        toast.success("Logged In successfully.");
-        return navigate("/", { replace: true });
-      })
-      .catch((error) => setApiErrors(error.response.data));
-  }
 
   return (
     <div className="flex justify-content-center h-[100vh] text-white">
       <div className="max-w-md min-w-[40%] min-h-[75%] mx-auto my-auto bg-gray-800 p-2 rounded">
         <h1 className="text-2xl text-center font-semibold mb-4">Login</h1>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(logUserIn)}>
           {/* Display errors */}
           {apiErrors && apiErrors.length > 0 && (
             <span className="mb-4 bg-red-500 p-2 w-full block">
@@ -97,11 +114,15 @@ export default function LoginForm() {
           <Link to="/forgot-password" className="text-right block mb-4">
             Forgot password
           </Link>
-          <input
-            type="submit"
-            value="Login"
-            className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
-          />
+          {isLoading ? (
+            <RequestLoader />
+          ) : (
+            <input
+              type="submit"
+              value="Login"
+              className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
+            />
+          )}
           <hr />
           <p className="text-center mt-6">
             Don't have an account yet ?{" "}

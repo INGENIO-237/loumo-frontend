@@ -1,12 +1,13 @@
-import { object, string } from "zod";
+import { object, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import getKey from "@/utils/key.generator";
 import { toast } from "react-toastify";
 import OTPInput from "react-otp-input";
-import { confirmPasswordReset } from "@/data/services/auth.services";
+import { ForgotPwdConfirmPayload } from "@/types/auth";
+import RequestLoader from "@/components/ui/request-loader";
 
 const forgotPwdConfirmSchema = object({
   password: string({ required_error: "Password is required" }).min(
@@ -15,21 +16,46 @@ const forgotPwdConfirmSchema = object({
   ),
 });
 
-export default function ForgotPasswordConfirmForm() {
+type ForgotPwdConfirmData = z.infer<typeof forgotPwdConfirmSchema>;
+
+type Props = {
+  confirmPasswordReset: (data: ForgotPwdConfirmPayload) => void;
+  error: any;
+  isLoading: boolean;
+  isSuccess: boolean;
+};
+
+export default function ForgotPasswordConfirmForm({
+  confirmPasswordReset,
+  isLoading,
+  isSuccess,
+  error,
+}: Props) {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Password reset successfully");
+      localStorage.removeItem("email");
+
+      return navigate("/login");
+    }
+
+    if (error) setApiErrors(error.response.data);
+  }, [isSuccess, error]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<ForgotPwdConfirmData>({
     resolver: zodResolver(forgotPwdConfirmSchema),
   });
 
-  function onSubmit(data: any) {
+  async function onSubmit(data: ForgotPwdConfirmData) {
     setOtpError("");
     const { password } = data;
 
@@ -38,16 +64,7 @@ export default function ForgotPasswordConfirmForm() {
     } else {
       const email = localStorage.getItem("email") as string;
 
-      confirmPasswordReset({ email, otp: Number(otp), password })
-        .then(() => {
-          toast.success("Password reset successfully");
-          localStorage.removeItem("email");
-
-          return navigate("/login");
-        })
-        .catch((error) => {
-          setApiErrors(error.response.data);
-        });
+      confirmPasswordReset({ email, otp: Number(otp), password });
     }
   }
 
@@ -106,11 +123,15 @@ export default function ForgotPasswordConfirmForm() {
               </span>
             )}
           </div>
-          <input
-            type="submit"
-            value="Send"
-            className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
-          />
+          {isLoading ? (
+            <RequestLoader />
+          ) : (
+            <input
+              type="submit"
+              value="Send"
+              className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
+            />
+          )}
           <hr />
           <p className="text-center mt-6">
             <span

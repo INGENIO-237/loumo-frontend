@@ -1,7 +1,10 @@
 import { Routes as RoutesContainer, Route } from "react-router-dom";
-import { ForgotPasswordPage, LoginPage, RegisterPage } from "./pages/auth";
+import { 
+  ForgotPasswordPage, ForgotPasswordConfirmPage, 
+  LoginPage, 
+  RegisterPage 
+} from "./pages/auth";
 import MainLayout from "./layouts/MainLayout";
-import ForgotPasswordConfirmPage from "./pages/auth/ForgotPasswordConfirm";
 
 export default function Routes() {
   return (

@@ -1,11 +1,11 @@
-import { object, string } from "zod";
+import { object, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import getKey from "@/utils/key.generator";
 import { toast } from "react-toastify";
-import { requestPasswordReset } from "@/data/services/auth.services";
+import RequestLoader from "@/components/ui/request-loader";
 
 const forgotPwdSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -13,35 +13,47 @@ const forgotPwdSchema = object({
   ),
 });
 
-export default function ForgotPasswordForm() {
+type ForgotPwdData = z.infer<typeof forgotPwdSchema>;
+
+type Props = {
+  requestPasswordReset: (formData: ForgotPwdData) => void;
+  data: string;
+  error: any;
+  isSuccess: boolean;
+  isLoading: boolean;
+};
+
+export default function ForgotPasswordForm({
+  requestPasswordReset,
+  data,
+  isLoading,
+  isSuccess,
+  error,
+}: Props) {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      localStorage.setItem("email", data);
+
+      toast.success(
+        "An OTP CODE has been sent to your email address. Check it."
+      );
+
+      return navigate("/forgot-password-confirm", { replace: true });
+    }
+
+    if (error) setApiErrors(error.response.data);
+  }, [isSuccess, error]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<ForgotPwdData>({
     resolver: zodResolver(forgotPwdSchema),
   });
-
-  function onSubmit(data: any) {
-    const { email } = data;
-
-    requestPasswordReset({ email })
-      .then(() => {
-        localStorage.setItem("email", email);
-
-        toast.success(
-          "An OTP CODE has been sent to your email address. Check it."
-        );
-
-        return navigate("/forgot-password-confirm", { replace: true });
-      })
-      .catch((error) => {
-        setApiErrors(error.response.data);
-      });
-  }
 
   return (
     <div className="flex justify-content-center h-[100vh] text-white">
@@ -49,7 +61,7 @@ export default function ForgotPasswordForm() {
         <h1 className="text-2xl text-center font-semibold mb-4">
           Forgot Password
         </h1>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(requestPasswordReset)}>
           {/* Display errors */}
           {apiErrors && Array.isArray(apiErrors) && apiErrors.length > 0 && (
             <span className="mb-4 bg-red-500 p-2 w-full block">
@@ -88,11 +100,15 @@ export default function ForgotPasswordForm() {
               </span>
             )}
           </div>
-          <input
-            type="submit"
-            value="Send"
-            className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
-          />
+          {isLoading ? (
+            <RequestLoader />
+          ) : (
+            <input
+              type="submit"
+              value="Send"
+              className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
+            />
+          )}
           <hr />
           <p className="text-center mt-6">
             Already have an account ?{" "}

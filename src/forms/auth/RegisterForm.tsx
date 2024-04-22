@@ -1,10 +1,11 @@
-import { object, string } from "zod";
+import { object, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { registerUser } from "@/data/services/auth.services";
+import { useEffect, useState } from "react";
 import getKey from "@/utils/key.generator";
+import RequestLoader from "@/components/ui/request-loader";
+import { toast } from "react-toastify";
 
 const registerSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -22,7 +23,23 @@ const registerSchema = object({
   "Passwords do not match"
 );
 
-export default function RegisterForm() {
+type RegisterFormData = z.infer<typeof registerSchema>;
+
+type Props = {
+  registerUser: (formData: RegisterFormData) => void;
+  data: any;
+  isLoading: boolean;
+  error: any;
+  isSucess: boolean;
+};
+
+export default function RegisterForm({
+  registerUser,
+  data,
+  isLoading,
+  isSucess,
+  error,
+}: Props) {
   const [apiErrors, setApiErrors] = useState([]);
   const navigate = useNavigate();
 
@@ -30,21 +47,24 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
-  function onSubmit(data: any) {
-    registerUser(data)
-      .then(() => navigate("/login", { replace: true }))
-      .catch((error) => setApiErrors(error.response.data));
-  }
+  useEffect(() => {
+    if (isSucess && data) {
+      toast.success("Account created successfully");
+      navigate("/login", { replace: true });
+    }
+
+    if (error) setApiErrors(error.response.data);
+  }, [data, isSucess, error]);
 
   return (
     <div className="flex justify-content-center h-[100vh] text-white">
       <div className="max-w-md min-w-[40%] min-h-[75%] mx-auto my-auto bg-gray-800 p-2 rounded">
         <h1 className="text-2xl text-center font-semibold mb-4">Register</h1>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(registerUser)}>
           {/* Display errors */}
           {apiErrors && apiErrors.length > 0 && (
             <span className="mb-4 bg-red-500 p-2 w-full block">
@@ -105,11 +125,15 @@ export default function RegisterForm() {
               </span>
             )}
           </div>
-          <input
-            type="submit"
-            value="Register"
-            className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
-          />
+          {isLoading ? (
+            <RequestLoader />
+          ) : (
+            <input
+              type="submit"
+              value="Register"
+              className="bg-blue-500 px-5 py-2 w-full rounded cursor-pointer mb-4"
+            />
+          )}
           <hr />
           <p className="text-center mt-6">
             Already have an account ?{" "}
