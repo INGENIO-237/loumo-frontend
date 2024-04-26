@@ -2,6 +2,7 @@ import { useMutation } from "react-query";
 import server from "../server";
 import { LoginFormData } from "@/forms/auth/LoginForm";
 import { ForgotPwdConfirmPayload } from "@/types/auth";
+import { ShippingAddress } from "@/forms/auth/ProfileInfoForm";
 
 export function useLogUserIn() {
   async function logUserIn({ email, password }: LoginFormData) {
@@ -115,4 +116,34 @@ export function useConfirmForgotPassword() {
   } = useMutation(confirmPasswordReset);
 
   return { confirmForgotPassword, error, isLoading, isSuccess };
+}
+
+export function useUpdateProfile() {
+  async function updateProfile(data: {
+    email: string;
+    phone: string;
+    shippingAddress: ShippingAddress;
+  }) {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    return server
+      .put("/users/profile", data, {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+          ["x-refresh"]: refreshToken,
+        },
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  const {
+    mutateAsync: profileUpdate,
+    error,
+    isLoading,
+    isSuccess,
+  } = useMutation(updateProfile);
+
+  return { profileUpdate, error, isLoading, isSuccess };
 }
