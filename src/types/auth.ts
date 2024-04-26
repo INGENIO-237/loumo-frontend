@@ -9,9 +9,9 @@ type ShippingAddress = {
 export type User = {
   _id: string;
   email: string;
-  phone?: number;
+  phone?: string;
   isVerified: boolean;
-  shippingAddresses?: ShippingAddress;
+  shippingAddress?: ShippingAddress;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -10,6 +10,10 @@ import PhoneInput, {
 import "react-phone-number-input/style.css";
 import { useEffect, useState } from "react";
 import GooglePlaces from "@/components/GooglePlaces";
+import { useUpdateProfile } from "@/data/services/auth.services";
+import { toast } from "react-toastify";
+import getKey from "@/utils/key.generator";
+import RequestLoader from "@/components/ui/request-loader";
 
 const profileInfoSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -19,21 +23,31 @@ const profileInfoSchema = object({
 
 export type ProfileInfoData = z.infer<typeof profileInfoSchema>;
 
-type ShippingAddress = {
+type Coords = {
+  lat: number;
+  lng: number;
+};
+
+export type ShippingAddress = {
   location: string;
-  coords: {
-    lat: string;
-    lng: string;
-  };
+  coords: Coords;
 };
 
 export default function ProfileInfoForm() {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [phone, setPhone] = useState<E164Number>();
+  const [phone, setPhone] = useState<E164Number>(user?.phone as E164Number);
   const [phoneError, setPhoneError] = useState("");
 
-  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>();
-  const [shippingAddressError, setShippingAddressError] = useState("");
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
+    location: user?.shippingAddress?.location as string,
+    coords: user?.shippingAddress?.coords as Coords,
+  });
+
+  const [shippingAddressError] = useState("");
+  const [apiErrors, setApiErrors] = useState([]);
+
+  // Hook in charge of updating profile
+  const { profileUpdate, isLoading, isSuccess, error } = useUpdateProfile();
 
   useEffect(() => {
     if (phone) {
@@ -42,13 +56,25 @@ export default function ProfileInfoForm() {
       } else {
         setPhoneError("");
       }
+    } else {
+      setPhoneError("");
     }
+  }, [phone]);
 
-    console.log({ shippingAddress });
-  }, [phone, shippingAddress]);
+  useEffect(() => {
+    if (isSuccess) toast.success("Profile updated");
+    if (error) {
+      const serverErrors = error as any;
+      setApiErrors(serverErrors.response.data);
+    }
+  }, [isSuccess, error]);
 
-  function onSubmit(data: any) {
-    console.log(data);
+  async function onSubmit(data: any) {
+    await profileUpdate({
+      email: data.email,
+      phone: phone as E164Number,
+      shippingAddress: shippingAddress as ShippingAddress,
+    });
   }
 
   const {
@@ -62,6 +88,17 @@ export default function ProfileInfoForm() {
   return (
     <div className="relative">
       <form onSubmit={handleSubmit(onSubmit)}>
+        {apiErrors && apiErrors.length > 0 && (
+          <span className="mb-4 bg-red-500 p-2 w-full block text-white">
+            <ul>
+              {apiErrors.map((error: any) => (
+                <li key={getKey()} className="italic">
+                  {error.message}
+                </li>
+              ))}
+            </ul>
+          </span>
+        )}
         <div className="md:flex w-full justify-between items-center mb-4">
           <div className="md:w-[48%]">
             <label htmlFor="email" className="block mb-1">
@@ -108,18 +145,23 @@ export default function ProfileInfoForm() {
                 },
               });
             }}
+            defaultValue={shippingAddress.location}
           />
           {shippingAddressError && (
             <span className="text-red-500">{shippingAddressError}</span>
           )}
         </div>
         <div className="flex justify-center">
-          <button
-            type="submit"
-            className="bg-orange-500 px-5 py-2 rounded cursor-pointer mb-4 text-white w-[25%]"
-          >
-            Save
-          </button>
+          {isLoading ? (
+            <RequestLoader className="bg-orange-500 px-5 py-2 flex justify-center disabled w-[20%] rounded cursor-not-allowed mb-4 opacity-50" />
+          ) : (
+            <button
+              type="submit"
+              className="bg-orange-500 px-5 py-2 rounded cursor-pointer mb-4 text-white w-[25%]"
+            >
+              Save
+            </button>
+          )}
         </div>
       </form>
     </div>

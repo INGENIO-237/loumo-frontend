@@ -3,9 +3,10 @@ import GooglePlacesAutocomplete from "react-google-autocomplete";
 type Props = {
   className?: string;
   onPlaceSelected: (place: any) => void;
+  defaultValue?: string
 };
 
-export default function GooglePlaces({ className, onPlaceSelected }: Props) {
+export default function GooglePlaces({ className, onPlaceSelected, defaultValue }: Props) {
   return (
     <GooglePlacesAutocomplete
       apiKey={import.meta.env.VITE_GP_API_KEY as string}
@@ -15,6 +16,7 @@ export default function GooglePlaces({ className, onPlaceSelected }: Props) {
       options={{
         types: "cities",
       }}
+      defaultValue={defaultValue}
     />
   );
 }
