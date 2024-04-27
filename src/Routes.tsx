@@ -29,7 +29,7 @@ export default function Routes() {
       />
 
       {/* Protected routes */}
-      {/* <Route element={<ProtectedRoute />}> */}
+      <Route element={<ProtectedRoute />}>
         <Route
           path="/profile"
           element={
@@ -38,7 +38,7 @@ export default function Routes() {
             </MainLayout>
           }
         />
-      {/* </Route> */}
+      </Route>
     </RoutesContainer>
   );
 }

@@ -2,7 +2,6 @@ import server from "@/data/server";
 import { User } from "@/types/auth";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-
 interface AuthState {
   isAuthenticated: boolean;
   user?: User;
@@ -16,7 +15,15 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.isAuthenticated = false;
+      state.user = undefined;
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    },
+  },
   extraReducers(builder) {
     builder.addCase(getCurrentUser.fulfilled, (state, payload) => {
       state.isAuthenticated = true;
@@ -35,5 +42,7 @@ export const getCurrentUser = createAsyncThunk(
       .then((response) => response.data);
   }
 );
+
+export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;
