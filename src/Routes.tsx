@@ -8,6 +8,7 @@ import {
 } from "./pages/auth";
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import MerchantPage from "./pages/Merchant";
 
 export default function Routes() {
   return (
@@ -35,6 +36,14 @@ export default function Routes() {
           element={
             <MainLayout>
               <ProfilePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/become-merchant"
+          element={
+            <MainLayout>
+              <MerchantPage />
             </MainLayout>
           }
         />

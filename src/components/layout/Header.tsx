@@ -16,7 +16,9 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -57,6 +59,13 @@ export default function Header() {
                   <h1>Orders</h1>
                 </Link>
               </DropdownMenuItem>
+              {!user?.isMerchant && (
+                <DropdownMenuItem>
+                  <Link className="flex-1" to="/become-merchant">
+                    <h1>Become a merchant</h1>
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator className="bg-gray-100" />
               <DropdownMenuItem onClick={() => handleLogout()}>
                 <Link className="flex-1" to="#">

@@ -12,6 +12,8 @@ export type User = {
   phone?: string;
   isVerified: boolean;
   shippingAddress?: ShippingAddress;
+  isMerchant: boolean;
+  hasBeenDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
