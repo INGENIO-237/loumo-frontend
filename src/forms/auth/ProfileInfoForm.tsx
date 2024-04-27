@@ -2,7 +2,7 @@ import { object, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@/redux/store";
 import PhoneInput, {
   Value as E164Number,
   isValidPhoneNumber,
@@ -14,6 +14,8 @@ import { useUpdateProfile } from "@/data/services/auth.services";
 import { toast } from "react-toastify";
 import getKey from "@/utils/key.generator";
 import RequestLoader from "@/components/ui/request-loader";
+import { useDispatch } from "react-redux";
+import { getCurrentUser } from "@/redux/slices/authSlice";
 
 const profileInfoSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -46,6 +48,8 @@ export default function ProfileInfoForm() {
   const [shippingAddressError] = useState("");
   const [apiErrors, setApiErrors] = useState([]);
 
+  const dispatch = useDispatch<AppDispatch>();
+
   // Hook in charge of updating profile
   const { profileUpdate, isLoading, isSuccess, error } = useUpdateProfile();
 
@@ -62,7 +66,10 @@ export default function ProfileInfoForm() {
   }, [phone]);
 
   useEffect(() => {
-    if (isSuccess) toast.success("Profile updated");
+    if (isSuccess) {
+      toast.success("Profile updated");
+      dispatch(getCurrentUser(localStorage.getItem("accessToken") as string));
+    }
     if (error) {
       const serverErrors = error as any;
       setApiErrors(serverErrors.response.data);
