@@ -1,8 +1,8 @@
 import { Heart, ShoppingCart, User } from "lucide-react";
 import SearchBar from "./SearchBar";
 import MenuItem from "./MenuItem";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -11,11 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { logout } from "@/redux/slices/authSlice";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const { isAuthenticated, user } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    dispatch(logout());
+    toast.success("Logout successfully!");
+    navigate("/");
+  }
 
   return (
     <div className="w-full flex justify-evenly items-center bg-[#FEFEFE] p-5">
@@ -47,7 +58,7 @@ export default function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-100" />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLogout()}>
                 <Link className="flex-1" to="#">
                   <h1>Logout</h1>
                 </Link>
