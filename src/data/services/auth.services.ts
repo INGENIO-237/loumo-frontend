@@ -153,3 +153,20 @@ export function useUpdateProfile() {
 
   return { profileUpdate, error, isLoading, isSuccess };
 }
+
+export function useDeleteAccount() {
+  async function suppressAccount() {
+    return server.delete("/users/delete-my-account").catch((error) => {
+      throw error;
+    });
+  }
+
+  const {
+    mutateAsync: deleteAccount,
+    error,
+    isLoading,
+    isSuccess,
+  } = useMutation(suppressAccount);
+
+  return { deleteAccount, error, isLoading, isSuccess };
+}
