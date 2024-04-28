@@ -10,6 +10,7 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import MerchantPage from "./pages/Merchant";
 import VerifyAccountPage from "./pages/auth/VerifyAccount";
+import NotFoundPage from "./pages/errors/404";
 
 export default function Routes() {
   return (
@@ -50,6 +51,8 @@ export default function Routes() {
           }
         />
       </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
     </RoutesContainer>
   );
 }
