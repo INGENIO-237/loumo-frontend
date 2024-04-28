@@ -138,9 +138,7 @@ export default function ProfileInfoForm() {
           </div>
         </div>
         <div className="mb-10">
-          <label htmlFor="email" className="block mb-1">
-            Shipping Address
-          </label>
+          <label className="block mb-1">Shipping Address</label>
           <GooglePlaces
             className="w-full px-4 py-2 border rounded focus:outline-none focus:border-blue-500 text-black"
             onPlaceSelected={(place: any) => {

@@ -3,7 +3,17 @@ import server from "../server";
 
 export function useApplyMerchantStatus() {
   async function applyMerchantStatus() {
-    return server.put("/users/become-merchant");
+    return server.put(
+      "/users/become-merchant",
+      {},
+      {
+        headers: {
+          Authorization: ("Bearer " +
+            localStorage.getItem("accessToken")) as string,
+          ["x-refresh"]: localStorage.getItem("refreshToken") as string,
+        },
+      }
+    );
   }
 
   const {

@@ -1,3 +1,4 @@
+import Settings from "@/components/Settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileInfoForm from "@/forms/auth/ProfileInfoForm";
 import { RootState } from "@/redux/store";
@@ -41,6 +42,9 @@ export default function ProfilePage() {
           <ProfileInfoForm />
         </TabsContent>
         <TabsContent value={OPTIONS.STORES}>Stores here</TabsContent>
+        <TabsContent value={OPTIONS.SETTINGS}>
+          <Settings />
+        </TabsContent>
       </Tabs>
     </>
   );

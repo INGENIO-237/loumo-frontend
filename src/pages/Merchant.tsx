@@ -7,8 +7,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export default function MerchantPage() {
-  const [isChecked, setIsChecked] = useState(true);
+export default function MerchantPage() {  
+  const [isChecked, setIsChecked] = useState(false);
   const { becomeMerchant, isLoading, isSuccess, error } =
     useApplyMerchantStatus();
 
