@@ -1,27 +1,33 @@
 import { useMutation } from "react-query";
 import server from "../server";
-import { LoginFormData } from "@/forms/auth/LoginForm";
-import { ForgotPwdConfirmPayload } from "@/types/auth";
+import { ForgotPwdConfirmPayload, LoginCredentials } from "@/types/auth";
 import { ShippingAddress } from "@/forms/auth/ProfileInfoForm";
 
 export function useLogUserIn() {
-  async function logUserIn({ email, password }: LoginFormData) {
+  async function logUserIn({ email, password, otp }: LoginCredentials) {
     return server
-      .post("/sessions/login", { email, password })
+      .post("/sessions/login", { email, password, otp })
       .then((response) => {
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, refreshToken, otpGenerated } = response.data;
 
         localStorage.clear();
 
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        if (otpGenerated) {
+          localStorage.setItem("email", email);
+          localStorage.setItem("password", password);
+        } else {
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
 
-        server.defaults.headers.common.Authorization = "Bearer " + accessToken;
-        server.defaults.headers.common["x-refresh"] = refreshToken;
+          server.defaults.headers.common.Authorization =
+            "Bearer " + accessToken;
+          server.defaults.headers.common["x-refresh"] = refreshToken;
+        }
 
         return {
           accessToken: accessToken as string,
           refreshToken: refreshToken as string,
+          otpGenerated: otpGenerated as boolean,
         };
       })
       .catch((error) => {
