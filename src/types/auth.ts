@@ -21,11 +21,13 @@ export type User = {
 export type LoginCredentials = {
   email: string;
   password: string;
+  otp?: number;
 };
 
 export type LoginReturnData = {
   accessToken: string;
   refreshToken: string;
+  otpGenerated?: boolean;
 };
 
 export type ForgotPwdConfirmPayload = {

@@ -9,6 +9,7 @@ import {
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import MerchantPage from "./pages/Merchant";
+import VerifyAccountPage from "./pages/auth/VerifyAccount";
 
 export default function Routes() {
   return (
@@ -23,6 +24,7 @@ export default function Routes() {
       />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify" element={<VerifyAccountPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route
         path="/forgot-password-confirm"

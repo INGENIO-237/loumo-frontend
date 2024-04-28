@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { getCurrentUser } from "@/redux/slices/authSlice";
 import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
-import { LoginReturnData } from "@/types/auth";
+import { LoginCredentials, LoginReturnData } from "@/types/auth";
 import RequestLoader from "@/components/ui/request-loader";
 
 const loginSchema = object({
@@ -24,7 +24,7 @@ const loginSchema = object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 type Props = {
-  logUserIn: (credentials: LoginFormData) => void;
+  logUserIn: (credentials: LoginCredentials) => void;
   data: LoginReturnData;
   isSuccess: boolean;
   error: any;
@@ -44,10 +44,14 @@ export default function LoginForm({
 
   useEffect(() => {
     if (isSuccess && data) {
-      const { accessToken } = data;
-      dispatch(getCurrentUser(accessToken));
-      toast.success("Logged In successfully.");
-      return navigate("/", { replace: true });
+      const { accessToken, otpGenerated } = data;
+      if (otpGenerated) {
+        return navigate("/verify")
+      } else {
+        dispatch(getCurrentUser(accessToken));
+        toast.success("Logged In successfully.");
+        return navigate("/", { replace: true });
+      }
     }
 
     if (error) setApiErrors(error.response.data);
