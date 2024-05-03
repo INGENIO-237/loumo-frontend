@@ -25,3 +25,24 @@ export function useApplyMerchantStatus() {
 
   return { becomeMerchant, isLoading, isSuccess, error };
 }
+
+export function useGetStore() {
+  async function getCurrentMerchantProducts() {
+    return server
+      .get("/products/store")
+      .then((response) => response.data)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  const {
+    mutateAsync: getStore,
+    isLoading,
+    isSuccess,
+    data,
+    error,
+  } = useMutation(getCurrentMerchantProducts, { retry: true });
+
+  return { getStore, isLoading, isSuccess, data, error };
+}

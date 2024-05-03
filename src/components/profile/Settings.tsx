@@ -4,14 +4,14 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
+} from "../ui/accordion";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useDeleteAccount } from "@/data/services/auth.services";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { logout } from "@/redux/slices/authSlice";
-import RequestLoader from "./ui/request-loader";
+import RequestLoader from "../ui/request-loader";
 
 export default function Settings() {
   const [showDelete, setShowDelete] = useState(false);
