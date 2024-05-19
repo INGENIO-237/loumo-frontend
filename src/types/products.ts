@@ -14,3 +14,9 @@ export type StoreData = {
   mainImage: CloudinaryResource;
   additionals?: CloudinaryResource[];
 };
+
+export type Category = {
+  _id: string;
+  title: string;
+  tags?: string[];
+};
