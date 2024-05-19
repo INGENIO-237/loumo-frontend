@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Camera from "../../assets/camera.png";
 import { array, object, optional, string, z } from "zod";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { formatProductName } from "@/utils/util-functions";
+import { formatTextToCapitalized } from "@/utils/util-functions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import getKey from "@/utils/key.generator";
 
@@ -49,22 +49,31 @@ const addProductSchema = object({
 type AddProductFormData = z.infer<typeof addProductSchema>;
 
 export default function AddProductForm() {
-  const mainImageRef = useRef<HTMLInputElement>(null);
+  const hiddenImageRef = useRef<HTMLInputElement>();
+  const [mainImageUrl, setMainImageUrl] = useState("");
   const imageRef = useRef<HTMLImageElement>(null);
   const { categories } = useSelector((state: RootState) => state.category);
-  const [tagsChoices, setTagsChoices] = useState([]);
+  // const [tagsChoices, setTagsChoices] = useState([]);
 
   function handleMainImageClick() {
-    mainImageRef.current?.click();
+    hiddenImageRef.current?.click();
+  }
+
+  function handleImageOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files as FileList;
+    setMainImageUrl(URL.createObjectURL(files[0]));
   }
 
   const {
     register,
     formState: { errors },
     handleSubmit,
+    setValue,
   } = useForm<AddProductFormData>({
     resolver: zodResolver(addProductSchema),
   });
+
+  const { ref: mainImageRegisterRef, ...rest } = register("mainImage");
 
   function onSave(data: any) {
     console.log({ data });
@@ -72,7 +81,9 @@ export default function AddProductForm() {
 
   return (
     <form onSubmit={handleSubmit(onSave)}>
+      {/* Top */}
       <div className="flex w-full justify-between justify-items-center">
+        {/* Left */}
         <div className="w-[45%]">
           <div className="mb-4">
             <label htmlFor="name" className="block mb-1">
@@ -101,7 +112,7 @@ export default function AddProductForm() {
             >
               {categories.map((category) => (
                 <option value={category._id} key={getKey()}>
-                  {formatProductName(category.title)}
+                  {formatTextToCapitalized(category.title)}
                 </option>
               ))}
             </select>
@@ -129,26 +140,44 @@ export default function AddProductForm() {
             )}
           </div>
         </div>
-        <div className="border w-[50%]">
-          <div className="flex justify-center justify-items-center">
+        {/* Right */}
+        <div className="border w-[50%] flex flex-col justify-center justify-items-center">
+          <div className="w-full flex justify-center">
             <input
               type="file"
-              className="hidden"
+              className="hidden w-full h-full"
               accept="image/png, image/jpg, image/jpeg"
               max={1}
-              {...register("mainImage")}
-              ref={mainImageRef}
+              {...rest}
+              onChange={(e) => {
+                handleImageOnChange(e);
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                  setValue("mainImage", files[0]);
+                }
+              }}
+              ref={(e) => {
+                mainImageRegisterRef(e);
+                hiddenImageRef.current = e as HTMLInputElement;
+              }}
             />
             <img
-              src={Camera}
+              src={mainImageUrl !== "" ? mainImageUrl : Camera}
               ref={imageRef}
               alt="Camera"
               className="w-[15em] hover:cursor-pointer"
               onClick={() => handleMainImageClick()}
             />
           </div>
+          {errors.mainImage && (
+            <span className="text-red-500 mt-5 w-full flex justify-center">
+              {errors.mainImage.message?.toString()}
+            </span>
+          )}
         </div>
       </div>
+      {/* Bottom */}
+      <div></div>
       <button type="submit">Add</button>
     </form>
   );

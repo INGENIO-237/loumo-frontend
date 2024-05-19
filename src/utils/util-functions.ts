@@ -1,4 +1,4 @@
-export function formatProductName(name: string) {
+export function formatTextToCapitalized(name: string) {
   return name
     .toLowerCase()
     .split(" ")

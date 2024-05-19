@@ -52,9 +52,9 @@ export default function Store() {
             <DialogHeader>
               <DialogTitle>New Product</DialogTitle>
             </DialogHeader>
-            {/* <DialogDescription> */}
+            <DialogDescription>
             <AddProductForm />
-            {/* </DialogDescription> */}
+            </DialogDescription>
             <DialogFooter>
               <button type="button" onClick={() => setShowModal(false)}>
                 Cancel
