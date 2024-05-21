@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ProductCard from "../products/ProductCard";
-import { useGetStore } from "@/data/services/merchant.services";
+import { useAddProduct, useGetStore } from "@/data/services/merchant.services";
 import getKey from "@/utils/key.generator";
 import {
   Dialog,
@@ -21,16 +21,27 @@ export default function Store() {
   const [store, setStore] = useState<StoreData[]>([]);
   const { getStore, isLoading, isSuccess, data, error } = useGetStore();
   const [showModal, setShowModal] = useState(false);
+  const {
+    addProduct,
+    isLoading: productIsLoading,
+    isSuccess: productIsSuccess,
+    error: productError,
+  } = useAddProduct();
 
   useEffect(() => {
     if (isSuccess && data) setStore(data);
+
+    if (productIsSuccess) {
+      getStore();
+      setShowModal(false);
+    }
 
     if (!isSuccess && store.length < 1) {
       getStore();
     }
 
-    if (error) toast.error("Something went wrong. Retry.");
-  }, [getStore, data, isSuccess, error]);
+    if (error || productError) toast.error("Something went wrong. Retry.");
+  }, [getStore, data, isSuccess, error, productIsSuccess, productError]);
   return (
     <div>
       {/* Add a product */}
@@ -43,7 +54,6 @@ export default function Store() {
             <button
               type="button"
               className="bg-orange-500 p-2 rounded text-white"
-              onClick={() => setShowModal(true)}
             >
               + product
             </button>
@@ -53,14 +63,16 @@ export default function Store() {
               <DialogTitle>New Product</DialogTitle>
             </DialogHeader>
             <DialogDescription>
-            <AddProductForm />
+              <AddProductForm addProduct={addProduct} />
             </DialogDescription>
-            <DialogFooter>
-              <button type="button" onClick={() => setShowModal(false)}>
-                Cancel
-              </button>
-              <button type="submit">Add</button>
-            </DialogFooter>
+            {!productIsLoading && (
+              <DialogFooter>
+                <button type="button" onClick={() => setShowModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit">Add</button>
+              </DialogFooter>
+            )}
           </DialogContent>
         </Dialog>
       </div>

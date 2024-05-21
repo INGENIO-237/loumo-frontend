@@ -12,7 +12,7 @@ const addProductSchema = object({
   name: string({
     required_error: "Product name is required",
     invalid_type_error: "Product name must be a string",
-  }),
+  }).refine((data) => data !== "", "Name cannot be empty"),
   category: string({
     required_error: "Category must be provided",
     invalid_type_error: "Category must be a string",
@@ -24,7 +24,10 @@ const addProductSchema = object({
   ),
   price: string({
     required_error: "Price is required",
-  }),
+  }).refine(
+    (data) => data !== "" && !Number.isNaN(data) && Number(data) > 0,
+    "Price should be a number and greater than 0"
+  ),
   characteristics: optional(
     array(
       string({
@@ -46,9 +49,13 @@ const addProductSchema = object({
   ),
 });
 
-type AddProductFormData = z.infer<typeof addProductSchema>;
+export type AddProductFormData = z.infer<typeof addProductSchema>;
 
-export default function AddProductForm() {
+type Props = {
+  addProduct: (data: AddProductFormData) => void;
+};
+
+export default function AddProductForm({ addProduct }: Props) {
   const hiddenImageRef = useRef<HTMLInputElement>();
   const [mainImageUrl, setMainImageUrl] = useState("");
   const imageRef = useRef<HTMLImageElement>(null);
@@ -76,7 +83,7 @@ export default function AddProductForm() {
   const { ref: mainImageRegisterRef, ...rest } = register("mainImage");
 
   function onSave(data: any) {
-    console.log({ data });
+    addProduct(data);
   }
 
   return (
@@ -157,8 +164,8 @@ export default function AddProductForm() {
                 }
               }}
               ref={(e) => {
-                mainImageRegisterRef(e);
                 hiddenImageRef.current = e as HTMLInputElement;
+                mainImageRegisterRef(e);
               }}
             />
             <img
