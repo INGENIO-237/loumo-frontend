@@ -15,12 +15,17 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import AddProductForm from "@/forms/products/AddProductForm";
+import Pagination from "../products/Pagination";
 
 export default function Store() {
-  const dummyStore = [1, 2, 3, 6, 56,8];
+  const dummyStore = [1, 2, 3, 6, 56, 8];
   const [store, setStore] = useState<StoreData[]>([]);
   const { getStore, isLoading, isSuccess, data, error } = useGetStore();
   const [showModal, setShowModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [perPage] = useState(3);
+
   const {
     addProduct,
     isLoading: productIsLoading,
@@ -29,19 +34,36 @@ export default function Store() {
   } = useAddProduct();
 
   useEffect(() => {
-    if (isSuccess && data) setStore(data);
+    if (isSuccess && data) {
+      setStore(data.products);
+      setTotal(data.total);
+    }
 
     if (productIsSuccess) {
-      // getStore();
       setShowModal(false);
     }
 
     if (store.length < 1) {
-      getStore();
+      getStore({ page, perPage });
     }
 
     if (error || productError) toast.error("Something went wrong. Retry.");
   }, [getStore, data, isSuccess, error, productIsSuccess, productError, store]);
+
+  useEffect(() => {
+    getStore({ page, perPage });
+  }, [perPage, page]);
+
+  function handleNext() {
+    const maxPages = Math.round(total / perPage);
+
+    if (page < maxPages) setPage(page + 1);
+  }
+
+  function handlePrev() {
+    if (page > 1) setPage(page - 1);
+  }
+
   return (
     <div>
       {/* Add a product */}
@@ -93,6 +115,15 @@ export default function Store() {
               <ProductCard product={product} key={getKey()} isMerchant />
             ))
           : null}
+        {total > 0 && (
+          <Pagination
+            total={total}
+            page={page}
+            perPage={perPage}
+            handlePrev={handlePrev}
+            handleNext={handleNext}
+          />
+        )}
       </div>
     </div>
   );

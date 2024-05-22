@@ -30,9 +30,20 @@ export function useApplyMerchantStatus() {
 }
 
 export function useGetStore() {
-  async function getCurrentMerchantProducts() {
+  async function getCurrentMerchantProducts({
+    page,
+    perPage,
+  }: {
+    page: number;
+    perPage: number;
+  }) {
     return server
-      .get("/products/store")
+      .get("/products/store", {
+        params: {
+          page,
+          perPage,
+        },
+      })
       .then((response) => response.data)
       .catch((error) => {
         throw error;
