@@ -10,6 +10,7 @@ import { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
 import { LoginCredentials, LoginReturnData } from "@/types/auth";
 import RequestLoader from "@/components/ui/request-loader";
+import { getCategories } from "@/redux/slices/categorySlice";
 
 const loginSchema = object({
   email: string({ required_error: "Email is required" }).email(
@@ -46,9 +47,10 @@ export default function LoginForm({
     if (isSuccess && data) {
       const { accessToken, otpGenerated } = data;
       if (otpGenerated) {
-        return navigate("/verify")
+        return navigate("/verify");
       } else {
         dispatch(getCurrentUser(accessToken));
+        dispatch(getCategories());
         toast.success("Logged In successfully.");
         return navigate("/", { replace: true });
       }

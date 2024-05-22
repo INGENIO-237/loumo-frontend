@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./slices/authSlice";
+import categoryReducer from "./slices/categorySlice";
 
 const persistConfig = {
   key: "root",
@@ -11,11 +12,15 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(
   persistConfig,
-  combineReducers({ auth: authReducer })
+  combineReducers({ auth: authReducer, category: categoryReducer })
 );
 
 export const store = configureStore({
   reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

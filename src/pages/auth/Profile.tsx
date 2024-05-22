@@ -1,4 +1,5 @@
-import Settings from "@/components/Settings";
+import Settings from "@/components/profile/Settings";
+import Stores from "@/components/profile/Store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileInfoForm from "@/forms/auth/ProfileInfoForm";
 import { RootState } from "@/redux/store";
@@ -7,7 +8,7 @@ import { useSelector } from "react-redux";
 export default function ProfilePage() {
   const OPTIONS = {
     PERSONAL_INFO: "info",
-    STORES: "stores",
+    STORE: "store",
     SETTINGS: "settings",
   };
 
@@ -25,10 +26,10 @@ export default function ProfilePage() {
           </TabsTrigger>
           {user?.isMerchant && (
             <TabsTrigger
-              value={OPTIONS.STORES}
+              value={OPTIONS.STORE}
               className="data-[state=active]:bg-gray-100 w-[50%]"
             >
-              STORES
+              STORE
             </TabsTrigger>
           )}
           <TabsTrigger
@@ -41,7 +42,9 @@ export default function ProfilePage() {
         <TabsContent value={OPTIONS.PERSONAL_INFO}>
           <ProfileInfoForm />
         </TabsContent>
-        <TabsContent value={OPTIONS.STORES}>Stores here</TabsContent>
+        <TabsContent value={OPTIONS.STORE}>
+          <Stores />
+        </TabsContent>
         <TabsContent value={OPTIONS.SETTINGS}>
           <Settings />
         </TabsContent>
