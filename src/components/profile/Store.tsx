@@ -17,7 +17,7 @@ import {
 import AddProductForm from "@/forms/products/AddProductForm";
 
 export default function Store() {
-  const dummyStore = [1, 2, 3];
+  const dummyStore = [1, 2, 3, 6, 56,8];
   const [store, setStore] = useState<StoreData[]>([]);
   const { getStore, isLoading, isSuccess, data, error } = useGetStore();
   const [showModal, setShowModal] = useState(false);
@@ -32,16 +32,16 @@ export default function Store() {
     if (isSuccess && data) setStore(data);
 
     if (productIsSuccess) {
-      getStore();
+      // getStore();
       setShowModal(false);
     }
 
-    if (!isSuccess && store.length < 1) {
+    if (store.length < 1) {
       getStore();
     }
 
     if (error || productError) toast.error("Something went wrong. Retry.");
-  }, [getStore, data, isSuccess, error, productIsSuccess, productError]);
+  }, [getStore, data, isSuccess, error, productIsSuccess, productError, store]);
   return (
     <div>
       {/* Add a product */}
@@ -77,14 +77,14 @@ export default function Store() {
         </Dialog>
       </div>
 
-      <div className="mt-5 md:flex md:justify-between md:flex-wrap">
+      <div className="mt-5 flex flex-col items-center md:flex md:flex-row md:justify-between md:flex-wrap">
         {isLoading
           ? dummyStore.map((_, index) => {
               return (
-                <div className="w-[31.2%] h-[150px] mb-5" key={index}>
+                <div className="w-[31.2%] h-[150px] mb-20" key={index}>
                   <Skeleton className="w-full h-full" />
-                  <Skeleton className="w-[75%] h-[20px] mt-5" />
-                  <Skeleton className="w-[40%] h-[20px] mt-5" />
+                  <Skeleton className="w-[75%] h-[20px] mt-2" />
+                  <Skeleton className="w-[40%] h-[20px] mt-2" />
                 </div>
               );
             })

@@ -51,9 +51,9 @@ export function useGetStore() {
 }
 
 export function useAddProduct() {
-const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  async function createProduct(data: AddProductFormData) {
+  async function createProduct(data: AddProductFormData & { tags: string[] }) {
     const formData = new FormData();
 
     formData.append("name", data.name);

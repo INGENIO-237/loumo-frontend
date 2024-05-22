@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Camera from "../../assets/camera.png";
 import { array, object, optional, string, z } from "zod";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,7 @@ import { RootState } from "@/redux/store";
 import { formatTextToCapitalized } from "@/utils/util-functions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import getKey from "@/utils/key.generator";
+import Tag from "@/components/products/Tag";
 
 const addProductSchema = object({
   name: string({
@@ -17,11 +18,6 @@ const addProductSchema = object({
     required_error: "Category must be provided",
     invalid_type_error: "Category must be a string",
   }),
-  tags: optional(
-    array(string({ invalid_type_error: "A tag must be of type string" }), {
-      invalid_type_error: "Product's tags must be an array of tags",
-    })
-  ),
   price: string({
     required_error: "Price is required",
   }).refine(
@@ -52,7 +48,7 @@ const addProductSchema = object({
 export type AddProductFormData = z.infer<typeof addProductSchema>;
 
 type Props = {
-  addProduct: (data: AddProductFormData) => void;
+  addProduct: (data: AddProductFormData & { tags: string[] }) => void;
 };
 
 export default function AddProductForm({ addProduct }: Props) {
@@ -60,7 +56,18 @@ export default function AddProductForm({ addProduct }: Props) {
   const [mainImageUrl, setMainImageUrl] = useState("");
   const imageRef = useRef<HTMLImageElement>(null);
   const { categories } = useSelector((state: RootState) => state.category);
-  // const [tagsChoices, setTagsChoices] = useState([]);
+  const [tagsChoices, setTagsChoices] = useState<string[]>([]);
+  const [category, setCategory] = useState(categories[0]._id);
+  const [tags, setTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    const cat = categories.filter((cat) => cat._id == category)[0];
+
+    if (cat) {
+      setTagsChoices(cat.tags as string[]);
+    }
+    console.log(tags);
+  }, [category, tags]);
 
   function handleMainImageClick() {
     hiddenImageRef.current?.click();
@@ -69,6 +76,22 @@ export default function AddProductForm({ addProduct }: Props) {
   function handleImageOnChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files as FileList;
     setMainImageUrl(URL.createObjectURL(files[0]));
+  }
+
+  function onCheck(tagName: string) {
+    setTags((value) => {
+      return [...value, tagName];
+    });
+  }
+
+  function onUncheck(tagName: string) {
+    const newTags = tags.filter((tag) => tag != tagName);
+
+    setTags([...newTags]);
+  }
+
+  function tagIsChecked(tagName: string) {
+    return tags.includes(tagName);
   }
 
   const {
@@ -81,8 +104,10 @@ export default function AddProductForm({ addProduct }: Props) {
   });
 
   const { ref: mainImageRegisterRef, ...rest } = register("mainImage");
+  const { ref: categoryRef, ...catRest } = register("category");
 
   function onSave(data: any) {
+    if (tags) data.tags = tags;
     addProduct(data);
   }
 
@@ -114,8 +139,12 @@ export default function AddProductForm({ addProduct }: Props) {
             </label>
             <select
               id="category"
-              {...register("category")}
+              {...catRest}
               className="w-full px-4 py-2 border rounded focus:outline-none focus:border-blue-500 text-black"
+              ref={(e) => {
+                categoryRef(e);
+              }}
+              onChange={(e) => setCategory(e.target.value)}
             >
               {categories.map((category) => (
                 <option value={category._id} key={getKey()}>
@@ -184,7 +213,32 @@ export default function AddProductForm({ addProduct }: Props) {
         </div>
       </div>
       {/* Bottom */}
-      <div></div>
+      <div>
+        <div className="mb-4">
+          <label htmlFor="name" className="block mb-1">
+            Tags
+          </label>
+          <div className="flex gap-2 mt-2">
+            {tagsChoices.map((tag) => {
+              return (
+                <Tag
+                  key={getKey()}
+                  index={getKey()}
+                  tag={tag}
+                  onCheck={onCheck}
+                  onUncheck={onUncheck}
+                  isChecked={tagIsChecked(tag)}
+                />
+              );
+            })}
+          </div>
+          {errors.name && (
+            <span className="text-red-500 mt-5">
+              {errors.name.message?.toString()}
+            </span>
+          )}
+        </div>
+      </div>
       <button type="submit">Add</button>
     </form>
   );
