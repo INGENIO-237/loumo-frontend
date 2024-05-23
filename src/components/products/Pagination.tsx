@@ -21,7 +21,7 @@ export default function Pagination({
       {page !== 1 && (
         <ArrowLeftSquare
           onClick={() => handlePrev()}
-          className="hover:cursor-pointer"
+          className="hover:cursor-pointer hover:scale-[120%] ease-in-out transform transition duration-500"
         />
       )}
       <span>
@@ -30,7 +30,7 @@ export default function Pagination({
       {pages !== 1 && (
         <ArrowRightSquare
           onClick={() => handleNext()}
-          className="hover:cursor-pointer"
+          className="hover:cursor-pointer hover:scale-[120%] ease-in-out transform transition duration-500"
         />
       )}
     </div>

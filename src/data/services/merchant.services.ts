@@ -3,20 +3,26 @@ import server from "../server";
 import { AddProductFormData } from "@/forms/products/AddProductForm";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import processNewAccessToken from "@/utils/access-token";
 
 export function useApplyMerchantStatus() {
   async function applyMerchantStatus() {
-    return server.put(
-      "/users/become-merchant",
-      {},
-      {
-        headers: {
-          Authorization: ("Bearer " +
-            localStorage.getItem("accessToken")) as string,
-          ["x-refresh"]: localStorage.getItem("refreshToken") as string,
-        },
-      }
-    );
+    return server
+      .put(
+        "/users/become-merchant",
+        {},
+        {
+          headers: {
+            Authorization: ("Bearer " +
+              localStorage.getItem("accessToken")) as string,
+            ["x-refresh"]: localStorage.getItem("refreshToken") as string,
+          },
+        }
+      )
+      .then((response) => processNewAccessToken(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   const {
@@ -44,7 +50,10 @@ export function useGetStore() {
           perPage,
         },
       })
-      .then((response) => response.data)
+      .then((response) => {
+        processNewAccessToken(response);
+        return response.data;
+      })
       .catch((error) => {
         throw error;
       });
@@ -97,7 +106,9 @@ export function useAddProduct() {
           "Content-Type": "multipart/formdata",
         },
       })
-      .then((response) => response)
+      .then((response) => {
+        processNewAccessToken(response);
+      })
       .catch((error) => {
         throw error;
       });
@@ -111,4 +122,27 @@ export function useAddProduct() {
   } = useMutation(createProduct);
 
   return { addProduct, isLoading, isSuccess, error };
+}
+
+export function useDeleteProduct() {
+  async function removeProduct(productId: string) {
+    return server
+      .delete(`/products/${productId}`)
+      .then((response) => {
+        processNewAccessToken(response);
+        return;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  const {
+    mutateAsync: deleteProduct,
+    isLoading,
+    isSuccess,
+    error,
+  } = useMutation(removeProduct);
+
+  return { deleteProduct, isLoading, isSuccess, error };
 }
