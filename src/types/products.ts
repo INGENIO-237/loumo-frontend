@@ -13,6 +13,7 @@ export type StoreData = {
   characteristics?: string[];
   mainImage: CloudinaryResource;
   additionals?: CloudinaryResource[];
+  hasBeenDeleted: boolean;
 };
 
 export type Category = {

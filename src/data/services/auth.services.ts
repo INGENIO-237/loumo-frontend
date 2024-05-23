@@ -2,6 +2,7 @@ import { useMutation } from "react-query";
 import server from "../server";
 import { ForgotPwdConfirmPayload, LoginCredentials } from "@/types/auth";
 import { ShippingAddress } from "@/forms/auth/ProfileInfoForm";
+import processNewAccessToken from "@/utils/access-token";
 
 export function useLogUserIn() {
   async function logUserIn({ email, password, otp }: LoginCredentials) {
@@ -139,6 +140,7 @@ export function useUpdateProfile() {
           ["x-refresh"]: refreshToken,
         },
       })
+      .then((response) => processNewAccessToken(response))
       .catch((error) => {
         throw error;
       });

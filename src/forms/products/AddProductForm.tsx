@@ -79,9 +79,11 @@ export default function AddProductForm({ addProduct }: Props) {
   }
 
   function onCheck(tagName: string) {
-    setTags((value) => {
-      return [...value, tagName];
-    });
+    if (!tags.includes(tagName)) {
+      setTags((value) => {
+        return [...value, tagName];
+      });
+    }
   }
 
   function onUncheck(tagName: string) {

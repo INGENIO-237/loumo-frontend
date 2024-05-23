@@ -15,19 +15,24 @@ export default function Pagination({
   handleNext,
   handlePrev,
 }: Props) {
+  const pages = Math.round(total / perPage);
   return (
     <div className="flex justify-center items-center w-full gap-2 mb-10">
-      <ArrowLeftSquare
-        onClick={() => handlePrev()}
-        className="hover:cursor-pointer"
-      />
+      {page !== 1 && (
+        <ArrowLeftSquare
+          onClick={() => handlePrev()}
+          className="hover:cursor-pointer hover:scale-[120%] ease-in-out transform transition duration-500"
+        />
+      )}
       <span>
-        {page} of {Math.round(total / perPage)}
+        {page} of {pages}
       </span>
-      <ArrowRightSquare
-        onClick={() => handleNext()}
-        className="hover:cursor-pointer"
-      />
+      {pages !== 1 && (
+        <ArrowRightSquare
+          onClick={() => handleNext()}
+          className="hover:cursor-pointer hover:scale-[120%] ease-in-out transform transition duration-500"
+        />
+      )}
     </div>
   );
 }
